@@ -25,7 +25,6 @@ docker-compose exec lv composer install
 APP_KEY=$(grep --color=never -Po "^APP_KEY=\K.*" ./.env || true)
 [ ${#APP_KEY} -le 3 ] && docker-compose exec lv php artisan key:generate --ansi
 
-docker-compose exec lv php artisan migrate
 docker-compose down
 
 APP_KEY=$(grep --color=never -Po "^APP_KEY=\K.*" ./.env || true)
