@@ -1,0 +1,55 @@
+version: '3'
+services:
+    lv:
+        build:
+            context: ./vendor/laravel/sail/runtimes/8.2
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: '${WWWGROUP:-1000}'
+        image: sail-8.2/betsflow-app
+        container_name: '${APP_NAME:-msvc}_lv'
+        restart: on-failure
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        ports:
+            - '${APP_PORT:-80}:80'
+        environment:
+            WWWUSER: '${WWWUSER:-1000}'
+            LARAVEL_SAIL: 1
+            XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
+            XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - mirror
+        depends_on:
+            - selenium
+    selenium:
+        image: selenium/standalone-chrome
+        container_name: '${APP_NAME:-msvc}_selenium'
+        hostname: selenium
+        restart: on-failure
+        environment:
+            TZ: "${TIMEZONE:-Europe/Moscow}"
+        ports:
+            - "7902:7900"
+        shm_size: "2gb"
+        extra_hosts:
+            - 'host.docker.internal:host-gateway'
+        volumes:
+            - '/dev/shm:/dev/shm'
+            - 'chrome-data:/external/chrome/data'
+        networks:
+            - mirror
+networks:
+    mirror:
+        driver: bridge
+    dbs:
+        external: true
+volumes:
+    chrome-data:
+        driver: local
+        driver_opts:
+            o: bind
+            type: none
+            device: ./volumes/selenium/chrome-data
