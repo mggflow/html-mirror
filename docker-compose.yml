@@ -44,8 +44,6 @@ services:
 networks:
     mirror:
         driver: bridge
-    dbs:
-        external: true
 volumes:
     chrome-data:
         driver: local
